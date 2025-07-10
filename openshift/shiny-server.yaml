@@ -38,8 +38,8 @@ objects:
       dockerStrategy:
         dockerfilePath: "${REPO_DOCKERFILE_PATH}"
     triggers:
-    - type: ImageChange
-    - type: ConfigChange
+      - type: ImageChange
+      - type: ConfigChange
 
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
@@ -58,35 +58,34 @@ objects:
       metadata:
         labels:
           app: "${APP_LABEL}"
-        name: "${APP_NAME}"
       spec:
         containers:
-        - image: "${APP_NAME}:latest"
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 3838
-            initialDelaySeconds: "${PROBE_INITIAL_DELAY}"
-            timeoutSeconds: "${PROBE_TIMEOUT}"
-          name: "${APP_NAME}"
-          ports:
-          - containerPort: 3838
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 3838
-            initialDelaySeconds: "${PROBE_INITIAL_DELAY}"
-            timeoutSeconds: "${PROBE_TIMEOUT}"
+          - image: "${APP_NAME}:latest"
+            name: "${APP_NAME}"
+            ports:
+              - containerPort: 3838
+            livenessProbe:
+              httpGet:
+                path: /
+                port: 3838
+              initialDelaySeconds: 30
+              timeoutSeconds: 30
+            readinessProbe:
+              httpGet:
+                path: /
+                port: 3838
+              initialDelaySeconds: 30
+              timeoutSeconds: 30
     triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - "${APP_NAME}"
-        from:
-          kind: ImageStreamTag
-          name: "${APP_NAME}:latest"
-      type: ImageChange
-    - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - "${APP_NAME}"
+          from:
+            kind: ImageStreamTag
+            name: "${APP_NAME}:latest"
+      - type: ConfigChange
 
 - apiVersion: v1
   kind: Service
@@ -96,12 +95,13 @@ objects:
     name: "${APP_NAME}"
   spec:
     ports:
-    - name: "${APP_NAME}-service"
-      port: 80
-      protocol: TCP
-      targetPort: 3838
+      - name: "${APP_NAME}-service"
+        port: 80
+        protocol: TCP
+        targetPort: 3838
     selector:
       app: "${APP_LABEL}"
+
 - apiVersion: v1
   kind: Route
   metadata:
@@ -115,24 +115,18 @@ objects:
       name: "${APP_NAME}"
 
 parameters:
-- name: APP_NAME
-  description: Name used for the app
-  value: shiny-app
-- name: APP_LABEL
-  description: Label used for the app
-  value: shiny
-- name: APP_GIT_URI
-  description: Deployment git uri
-  value: https://github.com/Duke-GCB/openshift-shiny.git
-- name: APP_GIT_BRANCH
-  description: Deployment git branch
-  value: master
-- name: REPO_DOCKERFILE_PATH
-  description: Deployment git branch
-  value: "examples/hello-shiny/Dockerfile"
-- name: PROBE_INITIAL_DELAY
-  description: Initial delay in seconds for liveness and readiness probes
-  value: "30"
-- name: PROBE_TIMEOUT
-  description: Timeout in seconds for liveness and readiness probes
-  value: "30"
+  - name: APP_NAME
+    description: Name used for the app
+    value: "shiny-app"
+  - name: APP_LABEL
+    description: Label used for the app
+    value: "shiny"
+  - name: APP_GIT_URI
+    description: Deployment git uri
+    value: "https://github.com/Duke-GCB/openshift-shiny.git"
+  - name: APP_GIT_BRANCH
+    description: Deployment git branch
+    value: "master"
+  - name: REPO_DOCKERFILE_PATH
+    description: Path to Dockerfile within the repo
+    value: "examples/hello-shiny/Dockerfile"
