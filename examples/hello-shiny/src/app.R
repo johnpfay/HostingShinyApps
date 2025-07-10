@@ -24,7 +24,7 @@ ui <- fluidPage(
       sliderInput("obs", 
                   "Number of observations:", 
                   min = 1, 
-                  max = 1000, 
+                  max = 3000, 
                   value = 500)
     ),
     
