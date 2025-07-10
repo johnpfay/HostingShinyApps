@@ -126,7 +126,7 @@ parameters:
     value: "https://github.com/Duke-GCB/openshift-shiny.git"
   - name: APP_GIT_BRANCH
     description: Deployment git branch
-    value: "master"
+    value: "main"
   - name: REPO_DOCKERFILE_PATH
     description: Path to Dockerfile within the repo
     value: "examples/hello-shiny/Dockerfile"
